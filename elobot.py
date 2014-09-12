@@ -108,10 +108,10 @@ def incoming(bot, user, chan, args):
         bot.say(chan, 'Register first!')
         return
 
-    bot.say(chan, 'incoming claims:')
+    bot.notice(user, 'incoming claims:')
     for g in state['pending']:
         if g['p2'] == player:
-            bot.say(chan, '%d: %s %s vs %s (%s)' %
+            bot.notice(user, '%d: %s %s vs %s (%s)' %
                     (g['id'], g['p1'], g['outcome'], g['p2'], g['date']))
 
 def outgoing(bot, user, chan, args):
@@ -120,10 +120,10 @@ def outgoing(bot, user, chan, args):
         bot.say(chan, 'Register first!')
         return
 
-    bot.say(chan, 'outgoing claims:')
+    bot.notice(user, 'outgoing claims:')
     for g in state['pending']:
         if g['p1'] == player:
-            bot.say(chan, '%d: %s %s vs %s (%s)' %
+            bot.notice(user, '%d: %s %s vs %s (%s)' %
                     (g['id'], g['p1'], g['outcome'], g['p2'], g['date']))
 
 def verify(bot, user, chan, args):
@@ -250,7 +250,7 @@ def top(bot, user, chan, args):
 
     for i, v in enumerate(topn):
         name, data = v
-        bot.say(chan, '#%d: %s (%d)' % (base+i, name, data['rating']))
+        bot.notice(user, '#%d: %s (%d)' % (base+i, name, data['rating']))
 
 
 cmds = {
@@ -279,6 +279,11 @@ class Bot(irc.IRCClient):
     def joined(self, channel):
         print('Joined %s.' % channel)
 
+    def notice(self, user, msg):
+        if type(msg) is unicode:
+            msg = msg.encode('utf-8')
+        irc.IRCClient.notice(self, user, msg)
+
     def say(self, channel, msg):
         if type(msg) is unicode:
             msg = msg.encode('utf-8')
@@ -295,7 +300,7 @@ class Bot(irc.IRCClient):
             self.say(channel, 'Eh?')
             return
 
-        cmd(self, user, channel, parts[1:])
+        cmd(self, user.split('!')[0], channel, parts[1:])
         save()
 
 
