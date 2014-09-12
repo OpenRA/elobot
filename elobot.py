@@ -288,7 +288,7 @@ class Bot(irc.IRCClient):
         if not msg.startswith(cmd_prefix):
             return
 
-        parts = msg[len(cmd_prefix):].split(' ')
+        parts = msg[len(cmd_prefix):].split()
         cmd = cmds.get(parts[0])
 
         if not cmd:
